@@ -1,6 +1,3 @@
-#include <cctype>
-#include <glm/ext/matrix_transform.hpp>
-#include <string>
 #define _ _
 #include <glad/glad.h>
 #define __ __
@@ -164,13 +161,6 @@ int main() {
 
     std::cout << "[INFO] Finished loading shaders!" << std::endl;
 
-    std::cout << "[INFO] Loading object..." << std::endl;
-
-    std::vector<Vertex> voxel_verticies =
-        parse_obj_format(load_whole_file("assets/wand.obj"));
-
-    std::cout << "[INFO] Finished loading objects!" << std::endl;
-
     // Creating shader program
     GLuint uvcolor_glprog =
         create_shader_program(vertex_shader, uvcolor_fragment_shader);
@@ -200,15 +190,19 @@ int main() {
     Mesh cube_mesh = Mesh::create_cube({3, 0.5, 0}, 1, uvcolor_glprog);
 
     // Create voxel mesh
-    Mesh voxel_mesh = Mesh(voxel_verticies, textured_glprog);
+    Mesh wand_mesh = Mesh::create_from_obj("assets/wand.obj", textured_glprog);
+
+    // Create shotgun mesh
+    Mesh shotgun_mesh =
+        Mesh::create_from_obj("assets/shotgun.obj", textured_glprog);
+
+    // Enable z buffer
+    glEnable(GL_DEPTH_TEST);
 
     // Set clear color
     glClearColor(0.7f, 0.7f, 0.7f, 1.f);
     std::chrono::high_resolution_clock::time_point last_time =
         std::chrono::high_resolution_clock::now();
-
-    // Enable z buffer
-    glEnable(GL_DEPTH_TEST);
 
     // Enable face culling
     glFrontFace(GL_CCW);
@@ -248,7 +242,7 @@ int main() {
         player.update(dt);
 
         rotation += PI * dt;
-        voxel_mesh.model = glm::rotate(glm::mat4(1), rotation, {0, 1, 0});
+        wand_mesh.model = glm::rotate(glm::mat4(1), rotation, {0, 1, 0});
 
         // screen clearing
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -262,7 +256,21 @@ int main() {
         floor_mesh.render(view, projection);
         /* quad_mesh.render(view, projection); */
         cube_mesh.render(view, projection);
-        voxel_mesh.render(view, projection);
+        wand_mesh.render(view, projection);
+
+        // clear depth buffer to draw always on top
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        shotgun_mesh.model = glm::translate(glm::mat4(1), player.position);
+        shotgun_mesh.model =
+            glm::rotate(shotgun_mesh.model, player.yaw, {0, 1, 0});
+        shotgun_mesh.model =
+            glm::rotate(shotgun_mesh.model, player.pitch, {1, 0, 0});
+        shotgun_mesh.model =
+            glm::translate(shotgun_mesh.model, {0.8f, -0.6f, -1.f});
+        shotgun_mesh.model = glm::rotate(shotgun_mesh.model, -PI / 2, {1, 0, 0});
+        shotgun_mesh.model = glm::scale(shotgun_mesh.model, glm::vec3(0.8f));
+        shotgun_mesh.render(view, projection);
 
         // glfw things after render
         glfwSwapBuffers(window);

@@ -18,6 +18,7 @@ struct Mesh {
                             glm::vec3 bottom_right, glm::vec3 bottom_left,
                             GLuint shader_prog);
     static Mesh create_cube(glm::vec3 center, float a, GLuint shader_prog);
+	static Mesh create_from_obj(const char* filename, GLuint shader_prog);
     void render(glm::mat4 view, glm::mat4 projection);
     ~Mesh();
 };

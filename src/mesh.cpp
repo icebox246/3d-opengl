@@ -176,6 +176,11 @@ Mesh Mesh::create_cube(glm::vec3 center, float a, GLuint shader_prog) {
     return Mesh(cube_verticies, shader_prog);
 }
 
+Mesh Mesh::create_from_obj(const char* filename, GLuint shader_prog) {
+    std::vector<Vertex> verticies = parse_obj_format(load_whole_file(filename));
+    return Mesh(verticies, shader_prog);
+}
+
 void Mesh::render(glm::mat4 view, glm::mat4 projection) {
     // Use shader program
     glUseProgram(prog);

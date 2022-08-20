@@ -29,6 +29,7 @@ GLuint create_shader_program(const char* vert_src, const char* frag_src) {
     if (log_size > 1) {
         std::vector<char> errmsg(log_size + 1, 0);
         glGetShaderInfoLog(vs, log_size, 0, errmsg.data());
+        std::cout << vert_src << ":" << std::endl;
         std::cout << errmsg.data() << std::endl;
     }
 
@@ -42,6 +43,7 @@ GLuint create_shader_program(const char* vert_src, const char* frag_src) {
     if (log_size > 1) {
         std::vector<char> errmsg(log_size + 1, 0);
         glGetShaderInfoLog(fs, log_size, 0, errmsg.data());
+        std::cout << frag_src << ":" << std::endl;
         std::cout << errmsg.data() << std::endl;
     }
 
@@ -122,6 +124,9 @@ GLuint load_texture_file(const char* filename) {
     glGenerateMipmap(GL_TEXTURE_2D);
 
     stbi_image_free(data);
+
+    std::cout << "[INFO] Loaded texture \"" << filename
+              << "\" with id: " << texture << std::endl;
 
     return texture;
 }
